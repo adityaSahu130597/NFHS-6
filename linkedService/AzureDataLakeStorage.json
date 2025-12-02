@@ -1,0 +1,15 @@
+{
+	"name": "AzureDataLakeStorage",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://adlsadi1305.dfs.core.windows.net/",
+			"credential": {
+				"referenceName": "adi_cred",
+				"type": "CredentialReference"
+			}
+		}
+	}
+}

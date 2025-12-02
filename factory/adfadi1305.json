@@ -1,0 +1,15 @@
+{
+	"name": "adfadi1305",
+	"location": "centralus",
+	"identity": {
+		"type": "SystemAssigned,UserAssigned",
+		"principalId": "859cd042-ea59-4de0-89c4-e8ddbdba96b3",
+		"tenantId": "9b37ff43-d9d9-43a9-a8f7-aec70ab294e8",
+		"userAssignedIdentities": {
+			"/subscriptions/627c15a9-3e5e-454e-a78f-0bd1071cf7aa/resourcegroups/adi_rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/adi_man": {
+				"clientId": "85259297-2ed9-4b1b-8007-90b9d4eca6b1",
+				"principalId": "5ed2c25d-469f-493e-9b36-dfbc9a42423c"
+			}
+		}
+	}
+}

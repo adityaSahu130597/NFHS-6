@@ -1,0 +1,127 @@
+{
+	"name": "restAPI_to_ADLS",
+	"properties": {
+		"activities": [
+			{
+				"name": "key_vault_secret_token",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://adikey13.vault.azure.net/secrets/Token/3a7ba4fe24204469bee9d00021a21a43?api-version=7.4",
+					"authentication": {
+						"resource": "https://vault.azure.net/",
+						"credential": {
+							"referenceName": "adi_cred",
+							"type": "CredentialReference"
+						},
+						"type": "UserAssignedManagedIdentity"
+					}
+				}
+			},
+			{
+				"name": "Set variable_AccessToken",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "key_vault_secret_token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "AccessToken",
+					"value": {
+						"value": "@concat('Bearer ', activity('key_vault_secret_token').output.value)\n",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Copy data_REST_to_ADLS",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set variable_AccessToken",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET",
+						"additionalHeaders": {
+							"Authorization": {
+								"value": "@variables('AccessToken')",
+								"type": "Expression"
+							}
+						},
+						"paginationRules": {
+							"supportRFC5988": "true"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_RestResource",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_param_folder_lvl",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_container": "landing",
+							"p_folder": "rest_data"
+						}
+					}
+				]
+			}
+		],
+		"variables": {
+			"AccessToken": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-07-28T10:12:52Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
